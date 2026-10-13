@@ -5,6 +5,11 @@ pipeline {
         maven 'M2_HOME'
     }
     stages {
+        stage('Hello') {
+            steps {
+                echo 'Démarrage du pipeline CI pour country-service'
+            }
+        }
         stage('Checkout code') {
             steps {
                 git branch: 'main', url: 'https://github.com/tasnimbouzamoucha/country-service.git'
@@ -29,6 +34,14 @@ pipeline {
             steps {
                 sh 'mvn package'
             }
+        }
+    }
+    post {
+        success {
+            echo 'Build réussi ✅'
+        }
+        failure {
+            echo 'Build échoué ❌'
         }
     }
 }
