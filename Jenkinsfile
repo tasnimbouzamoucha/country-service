@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Hello') {
             steps {
-                echo 'Démarrage du pipeline CI pour country-service'
+                echo 'démarrage du pipeline CI pour country-service'
             }
         }
         stage('Checkout code') {
