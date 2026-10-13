@@ -5,24 +5,14 @@ pipeline {
         maven 'M2_HOME'
     }
     stages {
-        stage('Hello') {
-            steps {
-                echo 'Démarrage du pipeline CI pour country-service'
-            }
-        }
         stage('Checkout code') {
             steps {
                 git branch: 'main', url: 'https://github.com/tasnimbouzamoucha/country-service.git'
             }
         }
-        stage('Compile code') {
+        stage('Compile, test code, package in jar file and store it in maven repo') {
             steps {
-                sh 'mvn compile'
-            }
-        }
-        stage('Test code') {
-            steps {
-                sh 'mvn test'
+                sh 'mvn clean install'
             }
             post {
                 success {
@@ -30,18 +20,12 @@ pipeline {
                 }
             }
         }
-        stage('Package code') {
+        stage('SonarQube Analysis') {
             steps {
-                sh 'mvn package'
+                withSonarQubeEnv(installationName: 'MySonarQubeServer', credentialsId: 'sonarqubePWD') {
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=country-service -Dsonar.projectName=country-service'
+                }
             }
-        }
-    }
-    post {
-        success {
-            echo 'Build réussi'
-        }
-        failure {
-            echo 'Build échoué'
         }
     }
 }
