@@ -36,12 +36,4 @@ pipeline {
             }
         }
     }
-    post {
-        success {
-            echo 'Build réussi'
-        }
-        failure {
-            echo 'Build échoué'
-        }
-    }
 }
