@@ -1,0 +1,15 @@
+services:
+  my-country-service1:
+    build: .
+    container_name: my-country-service1
+    ports:
+      - '8082:8082'
+    expose:
+      - '8082'
+  my-country-service2:
+    build: .
+    container_name: my-country-service2
+    ports:
+      - '8083:8082'
+    expose:
+      - '8082'
