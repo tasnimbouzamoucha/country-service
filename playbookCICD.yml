@@ -3,12 +3,13 @@
   hosts: localhost
   connection: local
 
+  vars_files:
+    - vault.yml
+
   vars:
     image_name: my-country-service
     image_tag: v1
     dockerfile_path: ./
-    docker_registry_username: tasnimbouzamoucha
-    docker_registry_password: "{{ lookup('env', 'DOCKERHUB_TOKEN') }}"
     kubeconfig_path: /Users/tasnimbouzamoucha/.kube/config
 
   tasks:
@@ -17,6 +18,7 @@
         username: "{{ docker_registry_username }}"
         password: "{{ docker_registry_password }}"
         reauthorize: true
+      no_log: true
 
     - name: Build Docker image
       community.docker.docker_image:
