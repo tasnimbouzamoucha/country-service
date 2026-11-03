@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: country-service-container
-        image: tasnimbouzamoucha/my-country-service:2
+        image: tasnimbouzamoucha/my-country-service:v1
         ports:
         - containerPort: 8082
