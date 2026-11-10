@@ -52,13 +52,9 @@ pipeline {
         // --- Etapes ajoutees : Continuous Delivery (Ansible -> Docker Hub -> Kubernetes) ---
         stage('Deploy using Ansible playbook') {
             steps {
-                // Le mot de passe du vault est stocke dans Jenkins (Secret text, ID : ansible-vault-pass)
-                withCredentials([string(credentialsId: 'ansible-vault-pass', variable: 'VAULT_PASS')]) {
-                    sh '''
-                        echo "$VAULT_PASS" > .vault_pass
-                        ansible-playbook -i hosts playbookCICD.yml --vault-password-file .vault_pass
-                        rm -f .vault_pass
-                    '''
+                // Le mot de passe du vault est stocke dans Jenkins (Secret file, ID : vault-pass)
+                withCredentials([file(credentialsId: 'vault-pass', variable: 'VAULT_FILE')]) {
+                    sh 'ansible-playbook -i hosts playbookCICD.yml --vault-password-file "$VAULT_FILE"'
                 }
             }
         }
