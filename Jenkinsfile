@@ -6,6 +6,8 @@ pipeline {
     }
     environment {
         NEXUS_URL = 'http://localhost:8081/repository/reports/country-service'
+        // Jenkins lance par brew services ne voit pas les outils Homebrew (ansible, docker, kubectl)
+        PATH = "/opt/homebrew/bin:/usr/local/bin:${env.PATH}"
     }
     stages {
         stage('Checkout code') {
@@ -45,6 +47,27 @@ pipeline {
                         curl -f -u $NEXUS_USER:$NEXUS_PWD --upload-file surefire-reports-${BUILD_NUMBER}.zip $NEXUS_URL/surefire-reports-${BUILD_NUMBER}.zip
                     '''
                 }
+            }
+        }
+        // --- Etapes ajoutees : Continuous Delivery (Ansible -> Docker Hub -> Kubernetes) ---
+        stage('Deploy using Ansible playbook') {
+            steps {
+                // Le mot de passe du vault est stocke dans Jenkins (Secret text, ID : ansible-vault-pass)
+                withCredentials([string(credentialsId: 'ansible-vault-pass', variable: 'VAULT_PASS')]) {
+                    sh '''
+                        echo "$VAULT_PASS" > .vault_pass
+                        ansible-playbook -i hosts playbookCICD.yml --vault-password-file .vault_pass
+                        rm -f .vault_pass
+                    '''
+                }
+            }
+        }
+        stage('Verify Kubernetes pods') {
+            steps {
+                sh '''
+                    kubectl rollout status deployment/my-country-service -n jenkins --timeout=180s
+                    kubectl get pods -n jenkins -l app=country-service
+                '''
             }
         }
     }
